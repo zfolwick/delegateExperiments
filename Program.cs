@@ -8,11 +8,16 @@ namespace ConsoleApplication
         [StructLayout(LayoutKind.Sequential)]
         public struct MI_ApplicationFT
         {
-            [UnmanagedFunctionPointe(CallingConvention.Cdecl)]
-            public delegate string UpperCaseDelegate(string input, int i);
+            public UpperCaseFirstDelegate UpperCaseFirst;
+            public UpperCaseLastDelegate UpperCaseLast;
         }
 
+        public delegate string UpperCaseFirstDelegate(string input);
 
+        public delegate string UpperCaseLastDelegate(string input);
+
+        [DllImport("./case.so", CharSet=CharSet.Ansi)]
+        public static extern int initializeFT(out MI_ApplicationFT managedAppFT);
 
        // public static string UpperCaseFirst(string input, int i)
        // {
@@ -41,6 +46,17 @@ namespace ConsoleApplication
     {
         public static void Main(string[] args)
         {
+           string testStr = "tester";
+
+           Native.MI_ApplicationFT ft;
+           Native.initializeFT(out ft);
+
+           Console.WriteLine("Back From C layer");
+           Native.UpperCaseFirstDelegate ucf = ft.UpperCaseFirst;
+           Console.WriteLine("delegate assigned");
+           string x = ucf(testStr);
+           Console.WriteLine("Worked!  result : {0}", x);
+
            // // C# way of delegates- no p/invokes
            // Console.WriteLine("Hello World!");
            // Native.MI_ApplicationFT.UpperCaseDelegate ucf = new Native.MI_ApplicationFT.UpperCaseDelegate(Native.UpperCaseFirst);
